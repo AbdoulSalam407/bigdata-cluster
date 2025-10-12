@@ -1,17 +1,3 @@
-bigdata-cluster/
-├── docker-compose.yml
-├── hadoop/
-│ ├── core-site.xml
-│ ├── hdfs-site.xml
-│ ├── yarn-site.xml
-│ ├── mapred-site.xml
-├── hive/
-│ ├── hive-site.xml
-├── spark/
-│ ├── spark-env.sh
-│ └── spark-defaults.conf
-└── nifi/
-└── conf/
 docker ps
 
 # 1️⃣ Supprimer les anciens conteneurs interrompus
