@@ -1,4 +1,9 @@
+version: "3.9"
+
 services:
+  # =========================
+  # 🗄️ Base de données PostgreSQL pour Hive Metastore
+  # =========================
   postgres:
     image: postgres:15
     container_name: postgres
@@ -12,13 +17,22 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
     networks:
       - bigdata-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hive -d metastore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # =========================
+  # 🧱 Hadoop - NameNode
+  # =========================
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
     environment:
       - CLUSTER_NAME=bigdata
     ports:
+      - "8020:8020"
       - "9870:9870"
       - "9000:9000"
     volumes:
@@ -28,7 +42,15 @@ services:
       - ./hadoop/hadoop.env
     networks:
       - bigdata-net
+    healthcheck:
+      test: ["CMD", "hdfs", "dfsadmin", "-safemode", "get"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
+  # =========================
+  # 🧱 Hadoop - DataNodes
+  # =========================
   datanode1:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode1
@@ -57,6 +79,9 @@ services:
     depends_on:
       - namenode
 
+  # =========================
+  # ⚡ Spark Master
+  # =========================
   spark:
     image: bde2020/spark-master:3.1.1-hadoop3.2
     container_name: spark
@@ -71,9 +96,10 @@ services:
       - bigdata-net
     depends_on:
       - namenode
-      - datanode1
-      - datanode2
 
+  # =========================
+  # ⚡ Spark Worker
+  # =========================
   spark-worker1:
     image: bde2020/spark-worker:3.1.1-hadoop3.2
     container_name: spark-worker1
@@ -86,23 +112,60 @@ services:
     depends_on:
       - spark
 
+  # =========================
+  # 🐝 Hive (Metastore + HiveServer2)
+  # =========================
   hive:
     image: bde2020/hive:2.3.2-postgresql-metastore
     container_name: hive
     environment:
-      - HIVE_METASTORE_DB_HOST=postgres
-      - HIVE_METASTORE_DB_NAME=metastore
-      - HIVE_METASTORE_DB_USER=hive
-      - HIVE_METASTORE_DB_PASS=hive
+      HIVE_METASTORE_DB_HOST: postgres
+      HIVE_METASTORE_DB_NAME: metastore
+      HIVE_METASTORE_DB_USER: hive
+      HIVE_METASTORE_DB_PASS: hive
+      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
+      HIVE_SITE_CONF_javax_jdo_option_ConnectionURL: jdbc:postgresql://postgres:5432/metastore
+      HIVE_SITE_CONF_javax_jdo_option_ConnectionDriverName: org.postgresql.Driver
+      HIVE_SITE_CONF_javax_jdo_option_ConnectionUserName: hive
+      HIVE_SITE_CONF_javax_jdo_option_ConnectionPassword: hive
     ports:
       - "10000:10000"
       - "10002:10002"
+      - "9083:9083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      namenode:
+        condition: service_healthy
     networks:
       - bigdata-net
-    depends_on:
-      - namenode
-      - postgres
+    volumes:
+      - ./scripts:/scripts
+    command: >
+      bash -c "
+        echo '🕒 Attente de HDFS et PostgreSQL...';
+        until nc -z namenode 9000 && nc -z postgres 5432; do
+          echo '⏳ En attente...';
+          sleep 5;
+        done;
+        echo '✅ HDFS et Postgres prêts.';
+        
+        echo '🔧 Initialisation du schéma Hive...';
+        /opt/hive/bin/schematool -dbType postgres -initSchema -verbose || echo 'ℹ️  Schéma peut-être déjà initialisé';
+        
+        echo '🚀 Démarrage du Metastore Hive en arrière-plan...';
+        /opt/hive/bin/hive --service metastore &
+        
+        echo '⏳ Attente du démarrage du Metastore...';
+        sleep 15;
+        
+        echo '🚀 Démarrage de HiveServer2...';
+        exec /opt/hive/bin/hiveserver2
+      "
 
+  # =========================
+  # 🔄 Apache NiFi
+  # =========================
   nifi:
     image: apache/nifi:1.27.0
     container_name: nifi
@@ -110,11 +173,13 @@ services:
       - "8089:8080"
     environment:
       - NIFI_WEB_HTTP_PORT=8080
+    volumes:
+      - ./data2:/data2
+      - ./hadoop:/opt/hadoop/etc/hadoop
     networks:
       - bigdata-net
     depends_on:
       - hive
-      - spark
 
 networks:
   bigdata-net:
