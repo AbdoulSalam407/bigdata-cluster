@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+  hdfs-site.xml : Configuration du stockage distribué HDFS.
+  Ce fichier permet de définir la réplication, les chemins de stockage
+  et les règles d'accès.
+-->
+<configuration>
+
+    <!-- Nombre de copies de chaque bloc dans le cluster -->
+    <!-- Très important pour la tolérance aux pannes et la haute disponibilité -->
+    <property>
+        <name>dfs.replication</name>
+        <value>2</value> <!-- Ici : 2 copies car on a 2 DataNodes -->
+    </property>
+
+    <!-- Répertoire où le NameNode stocke les métadonnées du système -->
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:///hadoop/dfs/name</value>
+    </property>
+
+    <!-- Répertoire où les DataNodes stockent réellement les blocs de données -->
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:///hadoop/dfs/data</value>
+    </property>
+
+    <!-- Désactivation des permissions Unix -->
+    <!-- Évite les blocages pour les environnements Docker -->
+    <property>
+        <name>dfs.permissions.enabled</name>
+        <value>false</value>
+    </property>
+
+<property><name>dfs.namenode.name.dir</name><value>file:///hadoop/dfs/name</value></property>
+<property><name>dfs.namenode.rpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.servicerpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.http-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.rpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.servicerpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.http-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.https-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.client.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.namenode.http-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.https-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.client.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.datanode.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.namenode.name.dir</name><value>file:///hadoop/dfs/name</value></property>
+<property><name>dfs.namenode.rpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.servicerpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.http-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.https-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.client.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.datanode.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.datanode.data.dir</name><value>file:///hadoop/dfs/data</value></property>
+<property><name>dfs.namenode.rpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.servicerpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.http-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.https-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.client.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.datanode.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.namenode.name.dir</name><value>file:///hadoop/dfs/name</value></property>
+<property><name>dfs.namenode.rpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.servicerpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.http-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.https-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.client.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.datanode.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.datanode.data.dir</name><value>file:///hadoop/dfs/data</value></property>
+<property><name>dfs.namenode.rpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.rpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.servicerpc-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.http-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.namenode.https-bind-host</name><value>0.0.0.0</value></property>
+<property><name>dfs.client.use.datanode.hostname</name><value>true</value></property>
+<property><name>dfs.datanode.use.datanode.hostname</name><value>true</value></property>
+</configuration>

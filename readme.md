@@ -1,494 +1,281 @@
-docker ps
+Voici un **README.md complet**, professionnel, clair et parfait pour ton GitHub ou ton rendu en tant que consultant Big Data.
+Il suit une structure standard utilisée dans les vrais projets en entreprise.
 
-# 1️⃣ Supprimer les anciens conteneurs interrompus
+---
 
-docker-compose down
+# ✅ **README.md — Cluster Big Data avec Docker**
 
-# 2️⃣ Supprimer les anciennes images partielles
+*(Copie-colle directement dans ton fichier `README.md`)*
 
-docker image prune -a -f
+---
 
-# 3️⃣ Relancer le cluster
+```md
+# 🚀 Cluster Big Data avec Docker  
+### Hadoop + Spark + Hive + PostgreSQL + Apache NiFi  
+### Architecture : 1 Master + 2 Slaves
 
+---
+
+## 📌 1. Introduction
+
+Ce projet met en place un **cluster Big Data complet** basé sur Docker, intégrant :
+
+- **Hadoop (HDFS + YARN)** — Stockage distribué et exécution des jobs  
+- **Spark** — Traitement distribué en mémoire  
+- **Hive** — Entrepôt de données avec interface SQL  
+- **Metastore PostgreSQL** — Métadonnées Hive  
+- **Apache NiFi** — ETL et ingestion de données  
+- **3 nœuds** : 1 Master + 2 Slaves
+
+L’objectif est d’obtenir un environnement complet pour :
+- Développement
+- Formation / démonstration Big Data
+- POC Data Engineering
+- Ingestion → Stockage → Traitement → Consultation SQL
+
+---
+
+## 📂 2. Architecture du Cluster
+
+```
+
+```
+                +------------------------+
+                |       PostgreSQL        |
+                |   Hive Metastore DB     |
+                +------------+------------+
+                             |
+                 +-----------v-----------+
+                 |     Hive Metastore    |
+                 +-----------+-----------+
+                             |
+            +----------------+----------------+
+            |                                 |
+   +--------v--------+               +--------v--------+
+   |     Master      |               |     Apache NiFi  |
+   |------------------|               -------------------
+   | Hadoop NameNode  |
+   | YARN ResourceMgr |
+   | Spark Master     |
+   | HiveServer2      |
+   +--------+---------+
+            |
+```
+
++-------------+----------------------------+
+|                                          |
++---v---+                                 +---v---+
+| Slave1|                                 | Slave2|
+|-------|                                 |-------|
+|DataNode|                                |DataNode|
+|SparkWrk|                                |SparkWrk|
++-------+                                 +--------+
+
+```
+
+---
+
+## 📁 3. Structure du Projet
+
+```
+
+bigdata-cluster/
+│
+├── docker-compose.yml
+│
+├── hadoop/
+│   └── config/
+│       ├── core-site.xml
+│       ├── hdfs-site.xml
+│       ├── yarn-site.xml
+│       └── mapred-site.xml
+│
+├── hive/
+│   └── config/
+│       ├── hive-site.xml
+│       └── metastore-site.xml
+│
+├── spark/
+│   └── config/
+│       └── spark-defaults.conf
+│
+├── nifi/
+│   └── config/
+│
+└── README.md
+
+````
+
+---
+
+## 🛠️ 4. Prérequis
+
+- Docker Desktop ≥ 4.x
+- Docker Compose ≥ v2
+- 8 GB RAM minimum
+- 20+ GB de stockage libre
+
+---
+
+## 🚀 5. Démarrage du Cluster
+
+### Étape 1 — Formater le NameNode
+(Docker oblige, première initialisation obligatoire)
+
+```bash
+docker-compose up -d master
+docker exec -it master hdfs namenode -format -force
+````
+
+### Étape 2 — Démarrer tout le cluster
+
+```bash
 docker-compose up -d
-
-docker pull bde2020/hadoop-namenode
-
-# 🧠 Projet Big Data Cluster avec Docker
-
-## Hadoop | Spark | Hive | PostgreSQL | Apache NiFi
+```
 
 ---
 
-## 🏗️ Introduction
+## 🔍 6. Interfaces Web
 
-Dans le cadre de mon apprentissage en **Ingénierie des Données**, j’ai mis en place un **cluster Big Data** complet basé sur **Docker**.  
-L’objectif est de **simuler un environnement distribué** similaire à un cluster de production, permettant le **stockage, le traitement et l’analyse de grandes volumétries de données**.
-
-Ce cluster comprend :
-
-- **Hadoop (HDFS)** pour le stockage distribué des données.
-- **Apache Spark** pour le calcul et le traitement en parallèle.
-- **Apache Hive** pour l’interrogation SQL des données sur HDFS.
-- **PostgreSQL** servant de base de métadonnées pour Hive.
-- **Apache NiFi** pour l’ingestion et l’orchestration des flux de données.
+| Service              | URL                                            |
+| -------------------- | ---------------------------------------------- |
+| Hadoop NameNode UI   | [http://localhost:9870](http://localhost:9870) |
+| YARN ResourceManager | [http://localhost:8088](http://localhost:8088) |
+| Spark Master UI      | [http://localhost:4040](http://localhost:4040) |
+| HiveServer2          | JDBC Port 10000                                |
+| NiFi Web UI          | [http://localhost:8080](http://localhost:8080) |
 
 ---
 
-## 🎯 Objectifs du projet
+## 🧪 7. Vérifications & Tests
 
-- Mettre en place un **cluster Big Data multi-nœuds** (1 master, 2 slaves) via **Docker Compose**.
-- Intégrer les **composants essentiels de l’écosystème Hadoop** (HDFS, Hive, Spark).
-- Automatiser le déploiement et la configuration des services.
-- Faciliter la création d’un **pipeline de données complet** : ingestion → stockage → traitement → visualisation.
+### ✔ Test HDFS
 
----
+```bash
+docker exec -it master hdfs dfs -ls /
+docker exec -it master hdfs dfs -mkdir /user
+```
 
-## 🧩 Architecture globale
+### ✔ Test Spark
 
-### 🔹 Vue d’ensemble du cluster
+```bash
+docker exec -it master spark-submit \
+  --class org.apache.spark.examples.SparkPi \
+  /spark/examples/jars/spark-examples*.jar 10
+```
 
-                 +-----------------------------+
-                 |        Master Node          |
-                 |-----------------------------|
-                 |  Hadoop NameNode            |
-                 |  Spark Master               |
-                 |  Hive + PostgreSQL Metastore|
-                 |  Apache NiFi                |
-                 +-----------------------------+
-                           |
-       -------------------------------------------------
-       |                                               |
-        +--------------------+ +--------------------+
-        | DataNode 1 | | DataNode 2 |
-        |--------------------| |--------------------|
-        | Hadoop Datanode | | Hadoop Datanode |
-        | Spark Worker | | Spark Worker |
-        +--------------------+ +--------------------+
+### ✔ Test Hive (avec Beeline)
 
----
+```bash
+docker exec -it master beeline -u jdbc:hive2://master:10000 \
+  -n hive -p hive \
+  -e "SHOW DATABASES;"
+```
 
-## ⚙️ Technologies utilisées
+Créer une table :
 
-| Outil              | Rôle                 | Description                                                                                    |
-| ------------------ | -------------------- | ---------------------------------------------------------------------------------------------- |
-| **Hadoop (HDFS)**  | Stockage distribué   | Découpe et répartit les fichiers sur plusieurs nœuds pour tolérance aux pannes et scalabilité. |
-| **Spark**          | Traitement distribué | Exécute les calculs à grande échelle en mémoire, plus rapide que MapReduce.                    |
-| **Hive**           | Interrogation SQL    | Fournit une interface SQL au-dessus d’HDFS pour manipuler les données facilement.              |
-| **PostgreSQL**     | Métastore Hive       | Contient les métadonnées des tables Hive (schémas, partitions, etc.).                          |
-| **NiFi**           | Ingestion de données | Permet de capturer, transformer et charger les données depuis diverses sources.                |
-| **Docker Compose** | Orchestration        | Permet de lancer et connecter tous les services avec une seule commande.                       |
+```sql
+CREATE TABLE test (id INT, name STRING);
+```
+
+### ✔ Test NiFi
+
+* Accéder à **[http://localhost:8080](http://localhost:8080)**
+* Importer un template
+* Exécuter un flux (ex : ingest → HDFS → Hive)
 
 ---
 
-## 🧱 Structure du cluster Docker
+## 🧱 8. Fonctionnement des Services
 
-### 📁 Arborescence du projet
+### 🔵 Master Node
 
+* NameNode
+* ResourceManager
+* Spark Master
+* HiveServer2
 
- docker exec -it namenode bash
+### 🔵 Slaves
 
-docker exec -it namenode bash
-root@d0569a8c43eb:/# hdfs dfs -mkdir -p /data2/test
-root@d0569a8c43eb:/# hdfs dfs -chown nifi:supergroup /data2/test
-root@d0569a8c43eb:/# hdfs dfs -ls /data2
-Found 1 items
-drwxr-xr-x   - nifi supergroup          0 2025-11-08 11:49 /data2/test
-root@d0569a8c43eb:/# hdfs dfs -ls /data2/test/temperatures
-ls: `/data2/test/temperatures': No such file or directory
-root@d0569a8c43eb:/# hdfs dfs -ls /data2/test
-root@d0569a8c43eb:/# hdfs dfs -ls /data2/test
-Found 1 items
-drwxr-xr-x   - nifi supergroup          0 2025-11-08 12:02 /data2/test/temperatures
-root@d0569a8c43eb:/# exit
-exit
+* DataNode
+* NodeManager
+* Spark Worker
 
+### 🔵 PostgreSQL
 
-version: "3.9"
+* Base de métadonnées Hive
 
-services:
-  # =========================
-  # 🗄️ Base de données PostgreSQL pour Hive Metastore
-  # =========================
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    environment:
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hive
-      POSTGRES_DB: metastore
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-    networks:
-      - bigdata-net
+### 🔵 Hive Metastore
 
-  # =========================
-  # 🧱 Hadoop - NameNode
-  # =========================
-  namenode:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    container_name: namenode
-    environment:
-      - CLUSTER_NAME=bigdata
-    ports:
-      - "8020:8020"
-      - "9870:9870"
-      - "9000:9000"
-    volumes:
-      - ./hadoop:/opt/hadoop/etc/hadoop
-      - namenode:/hadoop/dfs/name
-    env_file:
-      - ./hadoop/hadoop.env
-    networks:
-      - bigdata-net
+* Service intermédiaire entre Hive et PostgreSQL
 
-  # =========================
-  # 🧱 Hadoop - DataNodes
-  # =========================
-  datanode1:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: datanode1
-    environment:
-      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
-    ports:
-      - "9864:9864"
-    volumes:
-      - datanode1:/hadoop/dfs/data
-    networks:
-      - bigdata-net
-    depends_on:
-      - namenode
+### 🔵 Apache NiFi
 
-  datanode2:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: datanode2
-    environment:
-      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
-    ports:
-      - "9865:9864"
-    volumes:
-      - datanode2:/hadoop/dfs/data
-    networks:
-      - bigdata-net
-    depends_on:
-      - namenode
+* Ingestion / ETL automatisée
 
-  # =========================
-  # ⚡ Spark Master
-  # =========================
-  spark:
-    image: bde2020/spark-master:3.1.1-hadoop3.2
-    container_name: spark
-    environment:
-      - SPARK_MODE=master
-    ports:
-      - "8080:8080"
-      - "7077:7077"
-    volumes:
-      - ./spark:/spark/conf
-    networks:
-      - bigdata-net
-    depends_on:
-      - namenode
-      - datanode1
-      - datanode2
+---
 
-  # =========================
-  # ⚡ Spark Worker
-  # =========================
-  spark-worker1:
-    image: bde2020/spark-worker:3.1.1-hadoop3.2
-    container_name: spark-worker1
-    environment:
-      - SPARK_MASTER=spark://spark:7077
-    ports:
-      - "8081:8081"
-    networks:
-      - bigdata-net
-    depends_on:
-      - spark
+## 🔧 9. Administration du Cluster
 
-  # =========================
-  # 🐝 Hive (Metastore + HiveServer2)
-  # =========================
-  hive:
-    image: bde2020/hive:2.3.2-postgresql-metastore
-    container_name: hive
-    environment:
-      HIVE_METASTORE_DB_HOST: postgres
-      HIVE_METASTORE_DB_NAME: metastore
-      HIVE_METASTORE_DB_USER: hive
-      HIVE_METASTORE_DB_PASS: hive
-      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
-    ports:
-      - "10000:10000"
-      - "10002:10002"
-    depends_on:
-      - namenode
-      - datanode1
-      - datanode2
-      - postgres
-    networks:
-      - bigdata-net
-    command: >
-      bash -c "
-        echo '🕒 Attente de HDFS et PostgreSQL...';
-        until nc -z namenode 9000 && nc -z postgres 5432; do
-          echo '⏳ En attente de HDFS ou Postgres...';
-          sleep 5;
-        done;
-        echo '✅ HDFS et Postgres prêts.';
+### Logs d’un service
 
-        echo '🔧 Initialisation du schéma Hive (si nécessaire)...';
-        schematool -dbType postgres -initSchema || echo '✅ Schéma déjà initialisé.';
+```bash
+docker logs master -f
+```
 
-        echo '🚀 Démarrage du Metastore Hive...';
-        nohup /opt/hive/bin/hive --service metastore > /var/log/metastore.log 2>&1 &
+### Redémarrer un service
 
-        echo '🚀 Démarrage de HiveServer2...';
-        exec /opt/hive/bin/hive --service hiveserver2 --hiveconf hive.root.logger=INFO,console
-      "
+```bash
+docker-compose restart slave2
+```
 
-  # =========================
-  # 🔄 Apache NiFi
-  # =========================
-  nifi:
-    image: apache/nifi:1.27.0
-    container_name: nifi
-    ports:
-      - "8089:8080"
-    environment:
-      - NIFI_WEB_HTTP_PORT=8080
-    volumes:
-      - ./data2:/data2
-      - ./hadoop:/opt/hadoop/etc/hadoop
-    networks:
-      - bigdata-net
-    depends_on:
-      - hive
-      - spark
+### Arrêter tout
 
-# =========================
-# 🔗 Réseau et volumes
-# =========================
-networks:
-  bigdata-net:
+```bash
+docker-compose down
+```
 
-volumes:
-  namenode:
-  datanode1:
-  datanode2:
+### Supprimer volumes (nettoyage complet)
 
+```bash
+docker-compose down -v
+```
 
+---
 
+## 📌 10. Améliorations possibles
 
---------------------------------------------------------------------
+* Ajouter Kafka + Zookeeper
+* Ajouter Airflow (orchestration)
+* Intégrer Grafana + Prometheus pour monitoring
+* Ajouter Superset ou Metabase pour BI
+* Déployer sur Kubernetes (K8s)
 
+---
 
+## 📜 11. Licence
 
+Libre d'utilisation pour l'éducation, la formation, la démonstration et les POC Data Engineering.
 
+---
 
+## ✨ 12. Auteur
 
+Projet réalisé par **Abdoul Salam Diallo**
+Étudiant M1 | Data Engineering | Big Data & Cloud Computing
+UFR SET — Université Iba Der Thiam de Thiès
 
+---
 
+```
 
+---
 
+# 🎉 Si tu veux, je peux aussi te générer :
 
+✅ un **schéma PNG** de l’architecture  
+✅ un **README version professionnelle consultant (PDF)**  
+✅ un **PowerPoint prêt à présenter le projet**  
 
-
-
-
-
-
-version: "3.9"
-
-services:
-  # =========================
-  # 🗄️ Base de données PostgreSQL pour Hive Metastore
-  # =========================
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    environment:
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hive
-      POSTGRES_DB: metastore
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-    networks:
-      - bigdata-net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hive -d metastore"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # =========================
-  # 🧱 Hadoop - NameNode
-  # =========================
-  namenode:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    container_name: namenode
-    environment:
-      - CLUSTER_NAME=bigdata
-    ports:
-      - "8020:8020"
-      - "9870:9870"
-      - "9000:9000"
-    volumes:
-      - ./hadoop:/opt/hadoop/etc/hadoop
-      - namenode:/hadoop/dfs/name
-    env_file:
-      - ./hadoop/hadoop.env
-    networks:
-      - bigdata-net
-    healthcheck:
-      test: ["CMD", "hdfs", "dfsadmin", "-safemode", "get"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-
-  # =========================
-  # 🧱 Hadoop - DataNodes
-  # =========================
-  datanode1:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: datanode1
-    environment:
-      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
-    ports:
-      - "9864:9864"
-    volumes:
-      - datanode1:/hadoop/dfs/data
-    networks:
-      - bigdata-net
-    depends_on:
-      - namenode
-
-  datanode2:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: datanode2
-    environment:
-      - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
-    ports:
-      - "9865:9864"
-    volumes:
-      - datanode2:/hadoop/dfs/data
-    networks:
-      - bigdata-net
-    depends_on:
-      - namenode
-
-  # =========================
-  # ⚡ Spark Master
-  # =========================
-  spark:
-    image: bde2020/spark-master:3.1.1-hadoop3.2
-    container_name: spark
-    environment:
-      - SPARK_MODE=master
-    ports:
-      - "8080:8080"
-      - "7077:7077"
-    volumes:
-      - ./spark:/spark/conf
-    networks:
-      - bigdata-net
-    depends_on:
-      - namenode
-
-  # =========================
-  # ⚡ Spark Worker
-  # =========================
-  spark-worker1:
-    image: bde2020/spark-worker:3.1.1-hadoop3.2
-    container_name: spark-worker1
-    environment:
-      - SPARK_MASTER=spark://spark:7077
-    ports:
-      - "8081:8081"
-    networks:
-      - bigdata-net
-    depends_on:
-      - spark
-
-  # =========================
-  # 🐝 Hive (Metastore + HiveServer2)
-  # =========================
-  hive:
-    image: bde2020/hive:2.3.2-postgresql-metastore
-    container_name: hive
-    environment:
-      HIVE_METASTORE_DB_HOST: postgres
-      HIVE_METASTORE_DB_NAME: metastore
-      HIVE_METASTORE_DB_USER: hive
-      HIVE_METASTORE_DB_PASS: hive
-      CORE_CONF_fs_defaultFS: hdfs://namenode:9000
-      HIVE_SITE_CONF_javax_jdo_option_ConnectionURL: jdbc:postgresql://postgres:5432/metastore
-      HIVE_SITE_CONF_javax_jdo_option_ConnectionDriverName: org.postgresql.Driver
-      HIVE_SITE_CONF_javax_jdo_option_ConnectionUserName: hive
-      HIVE_SITE_CONF_javax_jdo_option_ConnectionPassword: hive
-    ports:
-      - "10000:10000"
-      - "10002:10002"
-      - "9083:9083"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      namenode:
-        condition: service_healthy
-    networks:
-      - bigdata-net
-    volumes:
-      - ./scripts:/scripts
-    command: >
-      bash -c "
-        echo '🕒 Attente de HDFS et PostgreSQL...';
-        until nc -z namenode 9000 && nc -z postgres 5432; do
-          echo '⏳ En attente...';
-          sleep 5;
-        done;
-        echo '✅ HDFS et Postgres prêts.';
-        
-        echo '🔧 Initialisation du schéma Hive...';
-        /opt/hive/bin/schematool -dbType postgres -initSchema -verbose || echo 'ℹ️  Schéma peut-être déjà initialisé';
-        
-        echo '🚀 Démarrage du Metastore Hive en arrière-plan...';
-        /opt/hive/bin/hive --service metastore &
-        
-        echo '⏳ Attente du démarrage du Metastore...';
-        sleep 15;
-        
-        echo '🚀 Démarrage de HiveServer2...';
-        exec /opt/hive/bin/hiveserver2
-      "
-
-  # =========================
-  # 🔄 Apache NiFi
-  # =========================
-  nifi:
-    image: apache/nifi:1.27.0
-    container_name: nifi
-    ports:
-      - "8089:8080"
-    environment:
-      - NIFI_WEB_HTTP_PORT=8080
-    volumes:
-      - ./data2:/data2
-      - ./hadoop:/opt/hadoop/etc/hadoop
-    networks:
-      - bigdata-net
-    depends_on:
-      - hive
-
-networks:
-  bigdata-net:
-
-volumes:
-  namenode:
-  datanode1:
-  datanode2:
+Dis-moi ce que tu veux.
+```

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+  yarn-site.xml : Configuration du cluster YARN.
+  YARN est responsable de la gestion des ressources (CPU/RAM)
+  et de l'exécution des tâches distribuées.
+-->
+<configuration>
+
+    <!-- Adresse du ResourceManager -->
+    <!-- Il coordonne tous les NodeManagers -->
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>namenode</value>
+    </property>
+
+    <!-- Activation du service MapReduce Shuffle -->
+    <!-- Nécessaire pour Hive et les jobs MapReduce -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+
+    <!-- Mémoire disponible pour chaque NodeManager -->
+    <!-- Ajustable selon la RAM de l’hôte -->
+    <property>
+        <name>yarn.nodemanager.resource.memory-mb</name>
+        <value>2048</value>
+    </property>
+
+    <!-- Limite maximale allouée à un container -->
+    <property>
+        <name>yarn.scheduler.maximum-allocation-mb</name>
+        <value>2048</value>
+    </property>
+
+<property><name>yarn.resourcemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.resourcemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.timeline-service.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.timeline-service.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.resourcemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.timeline-service.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.resourcemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.timeline-service.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.resourcemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.timeline-service.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.resourcemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.resourcemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.timeline-service.bind-host</name><value>0.0.0.0</value></property>
+</configuration>

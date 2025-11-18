@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+  mapred-site.xml : Configuration du framework MapReduce.
+  Permet d'exécuter les jobs MapReduce sur YARN au lieu du mode local.
+-->
+<configuration>
+
+    <!-- Indique que MapReduce doit s'exécuter sur YARN -->
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+
+    <!-- Classpath pour les librairies MapReduce -->
+    <!-- Obligatoire pour que les jobs Hive fonctionnent -->
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>
+            $HADOOP_MAPRED_HOME/*:$HADOOP_MAPRED_HOME/lib/*
+        </value>
+    </property>
+
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+<property><name>yarn.nodemanager.bind-host</name><value>0.0.0.0</value></property>
+</configuration>

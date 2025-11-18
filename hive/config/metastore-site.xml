@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+  metastore-site.xml : Fichier léger indiquant où contacter le metastore Thrift.
+-->
+<configuration>
+
+    <!-- Adresse du service Metastore Thrift -->
+    <property>
+        <name>metastore.thrift.uris</name>
+        <value>thrift://hive-metastore:9083</value>
+    </property>
+
+</configuration>

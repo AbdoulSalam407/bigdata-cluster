@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+  core-site.xml : Paramètres essentiels du système Hadoop.
+  Ici, on indique où se trouve le NameNode et où Hadoop stocke ses fichiers temporaires.
+-->
+<configuration>
+
+    <!-- Adresse du système de fichiers principal (HDFS) -->
+    <!-- Toutes les applications (Hive, Spark, NiFi) utiliseront cette URL pour accéder aux données -->
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://namenode:8020</value>
+    </property>
+
+    <!-- Répertoire temporaire utilisé par Hadoop -->
+    <!-- Important pour stocker des fichiers transitoires lors de l'exécution -->
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/hadoop/tmp</value>
+    </property>
+
+<property><name>fs.defaultFS</name><value>hdfs://0eccd7436167:8020</value></property>
+<property><name>fs.defaultFS</name><value>hdfs://21adedeb8bc1:8020</value></property>
+<property><name>fs.defaultFS</name><value>hdfs://d6dd0de38c33:8020</value></property>
+<property><name>fs.defaultFS</name><value>hdfs://45db5c9efde9:8020</value></property>
+<property><name>fs.defaultFS</name><value>hdfs://8977c00e5ce0:8020</value></property>
+<property><name>fs.defaultFS</name><value>hdfs://df7b02439aac:8020</value></property>
+<property><name>fs.defaultFS</name><value>hdfs://c722125998ad:8020</value></property>
+<property><name>fs.defaultFS</name><value>hdfs://37454a0ebe3a:8020</value></property>
+</configuration>
